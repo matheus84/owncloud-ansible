@@ -3,18 +3,12 @@
   remote_user: matheus
   become: yes
   tasks:
-    - name: Instala o servico Apache
-      apt: name=apache2 state=latest
-
-    - name: Garante que o Apache esta rodando
-      service: name=apache2 state=started enabled=yes
-
-    - name: Install python2.7
-      raw: "sudo apt-get update && sudo apt-get install python2.7 "
 
     - name: Instala DB's e app necessários
       apt: name={{ item }} state=latest update_cache=yes
       with_items:
+        - python2.7
+        - apache2
         - python-mysqldb
         - mariadb-client
         - mariadb-server 
@@ -29,6 +23,9 @@
         - php7.0-zip 
         - php7.0-xml 
         - php7.0-mbstring
+
+    - name: Garante que o Apache esta rodando
+      service: name=apache2 state=started enabled=yes
 
     - name: Cria DB Owncloud
       mysql_db: name=Owncloud state=present
