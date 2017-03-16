@@ -1,0 +1,55 @@
+---
+- hosts: exemplo
+  remote_user: matheus
+  become: yes
+  tasks:
+    - name: Instala o servico Apache
+      apt: name=apache2 state=latest
+
+    - name: Garante que o Apache esta rodando
+      service: name=apache2 state=started enabled=yes
+
+    - name: Install python2.7
+      raw: "sudo apt-get update && sudo apt-get install python2.7 "
+
+    - name: Instala DB's e app necessários
+      apt: name={{ item }} state=latest update_cache=yes
+      with_items:
+        - python-mysqldb
+        - mariadb-client
+        - mariadb-server 
+        - php7.0
+        - libapache2-mod-php7.0
+        - php7.0-gd
+        - php7.0-mysql
+        - php7.0-curl
+        - php7.0-intl
+        - php7.0-mcrypt 
+        - php-imagick
+        - php7.0-zip 
+        - php7.0-xml 
+        - php7.0-mbstring
+
+    - name: Cria DB Owncloud
+      mysql_db: name=Owncloud state=present
+
+    - name: Instalar Repositorio Owncloud
+      raw: "sudo wget -nv https://download.owncloud.org/download/repositories/9.1/Ubuntu_16.10/Release.key -O Release.key && sudo apt-key add - < Release.key"
+
+    - name: Instalar repositorio pt2
+      raw: "sudo sh -c 'echo deb http://download.owncloud.org/download/repositories/9.1/Ubuntu_16.10/ / > /etc/apt/sources.list.d/owncloud.list'"
+
+    - name: Apt-get update
+      raw: "sudo apt-get update"
+
+    - name: Instalar Owncloud
+      apt: name=owncloud state=latest
+      notify: restart apache2
+
+
+
+
+
+
+
+
